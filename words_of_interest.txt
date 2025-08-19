@@ -1,0 +1,10 @@
+Climate Change,1.5°c,2°c,two degree,climat*,dual challenge,warming,ipcc,kyoto,paris,unfccc,ogci,carbon activit*,carbon credit*,carbon cost*,carbon polic*,carbon pric*,carbon project*,carbon tax*,>carbon abatement,footprint,intensity,carbon neutral,>zero emission*,>zero waste,sink,>low carbon,decarbon*,transition*,sustainab*,carbon dioxide,co2,>carbon capture,carbon storage,carbon removal,ccs,ccus,>net zero,>zero net,flar*,greenhouse,ghg,methane,ch4,nitrous oxide,n2o,>energy efficiency,>energy efficient,renewable*,alga*,alternative fuel*,energy,wind,solar,geothermal,hydropower,hydrogen,batter*,biomass,biofuel*,bioenergy,biopower,ethanol,biodiesel,methanol,electric vehicle*,electric mobility,electric transport,ev,zev,non-zev,charging,charger*,>super charger*,electricit*,power
+Novel Entities,pollut*,pfas,plastic*,microplastic*,recycl*,circular economy,reuse,sustainable material*,waste,diversion,reduction*,insecticide*,pesticide*,cleaning product*,packag*,dyes
+Stratospheric Ozone Depletion,fluorocarbon*,hfc,cfc,montreal
+Atmospheric Aerosol Loading,wildfire*,fire*,acid rain,sulfur dioxide,sulfur oxide,so2
+Ocean Acidification,acidification,carbonate ion,calcium carbonate,restoration
+Biogeochemical Flows,nitrogen,phosphorus,nutrient*,fertiliz*,erosion,>run off
+Freshwater Change,water,>waste water,desalination,purification,eutrophication,>nutrient loading
+Land System Change,>land use,agricultur*,degrad*,fragment*,regenerat*,deforestation,afforestation,>rain forest,organic,gap,animal welfare,antibiotics,third party verification,>fair trade,f.l.a.g.,urbanization,brownfield,remedia*
+Biosphere Integrity,biodiversity,biosphere,extinction,species,extirpation,ecosystem,ecological resilienc*,ecological resistance,genetic,net primary productivity,conservation,habitat,invasive,ecotourism
+Social Responsibility,>science based targets,planetary boundaries,ecological footprint,natural capital,environmental impact assessment,eia
