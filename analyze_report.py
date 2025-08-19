@@ -19,7 +19,7 @@ partials = {'sustainab*': ['sustainable material*'], 'nutrient*': ['>nutrient lo
 #dictionary of terms that could be used to define acronyms
 acronyms = {'greenhouse': ['ghg'], 'climat*': ['unfccc', 'ipcc', 'ogci'], '>carbon capture': ['ccs', 'ccus'], 'fluorocarbon*': ['hfc', 'cfc']}
 
-st.title("Analyze File Sentiment for Planetary Boundary Framework Words")
+st.title("Analyze Files for Planetary Boundary Framework Sentiment")
 uploaded_files = st.file_uploader("Upload pdf files", type=['pdf'], accept_multiple_files=True)
 
 def process_text(text, report_info):
@@ -121,10 +121,11 @@ graph_info = []
 csv_info = []
 
 if uploaded_files:
+    st.header('Fill in info for each file.')
+    st.divider()
 
     for file in uploaded_files:
         st.subheader(file.name)
-
         year = st.text_input(f"Year for {file.name}", key=f"year_{file.name}")
         company = st.text_input(f"Company for {file.name}", key=f"company_{file.name}")
         report_type = st.text_input(f"Report Type for {file.name}", key=f"type_{file.name}")
