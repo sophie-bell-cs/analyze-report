@@ -121,16 +121,17 @@ graph_info = []
 csv_info = []
 
 if uploaded_files:
-    st.header('Fill in info for each file.')
+    st.header('Add information for each file. Press enter for each line before moving to the next.')
     st.divider()
 
     for file in uploaded_files:
         st.subheader(file.name)
-        year = st.text_input(f"Year for {file.name}", key=f"year_{file.name}")
-        company = st.text_input(f"Company for {file.name}", key=f"company_{file.name}")
-        report_type = st.text_input(f"Report Type for {file.name}", key=f"type_{file.name}")
+        year = st.text_input(f"Year:", key=f"year_{file.name}")
+        company = st.text_input(f"Company:", key=f"company_{file.name}")
+        report_type = st.text_input(f"Report Type:", key=f"type_{file.name}")
 
         report_info = [company, report_type, year]
+        st.divider()
 
     if year and company and report_type:
         pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
