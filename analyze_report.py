@@ -172,8 +172,9 @@ if graph_info:
         reports.sort(key=lambda x: x[0])
         for year, report_type, freq in reports:
             x_positions.append(current_x)
-
+            tick_labels.append(f"{company}, {year}, {report_type}")
             bottom = 0
+
             for cat_idx, category in enumerate(categories):
                 height = freq.get(category, 0)
                 ax.bar(current_x, height, bottom=bottom, width=bar_width,
