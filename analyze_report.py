@@ -121,22 +121,18 @@ graph_info = []
 csv_info = []
 
 if uploaded_files:
-    st.header('Add information for each file. Press enter for each line before moving to the next.')
+    st.header('Add information for each file separated by commas (year,company,report). Press enter for each line before moving to the next.')
     st.divider()
 
     for file in uploaded_files:
         st.subheader(file.name)
-        with st.form(key=f'form_{file.name}'):
-            year = st.text_input(f"Year:", key=f"year_{file.name}")
-            company = st.text_input(f"Company:", key=f"company_{file.name}")
-            report_type = st.text_input(f"Report Type:", key=f"type_{file.name}")
-            submit_button = st.form_submit_button(label='Submit Info'
-                                                        '')
-        if submit_button:
-            report_info = [company, report_type, year]
+        yr_comp_rep = st.text_input(f"Year,Company,Report Type", key=f"year_{file.name}")
+        elmnts = [e.strip() for e in yr_comp_rep.split(',')]
+
+        report_info = [elmnts[0], elmnts[1], elmnts[2]]
         st.divider()
 
-        if year and company and report_type:
+        if len(report_info) == 3:
             pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
             text = ""
             for page in pdf_reader.pages:
