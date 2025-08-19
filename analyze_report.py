@@ -126,77 +126,80 @@ if uploaded_files:
 
     for file in uploaded_files:
         st.subheader(file.name)
-        yr_comp_rep = st.text_input(f"Year,Company,Report Type", key=f"year_{file.name}")
-        elmnts = [e.strip() for e in yr_comp_rep.split(',')]
 
-        report_info = [elmnts[0], elmnts[1], elmnts[2]]
+        with st.form(key=f"form_{file.name}"):
+
+            yr_comp_rep = st.text_input(f"Year,Company,Report Type", key=f"year_{file.name}")
+            elmnts = [e.strip() for e in yr_comp_rep.split(',')]
+            if len(elmnts) == 3:
+                st.write(f'Year: {elmnts[0]}')
+                st.write(f'Company: {elmnts[1]}')
+                st.write(f'Report Type: {elmnts[2]}')
+                submit_button = st.form_submit_button(label='Submit Info')
         st.divider()
 
-        if len(report_info) == 3:
+        if submit_button:
             pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
             text = ""
             for page in pdf_reader.pages:
                 text += page.extract_text() or ""
 
-            result = process_text(text, report_info)
+            result = process_text(text, elmnts)
             graph_result = [result[0][0], result[0][1], result[0][2], result[1]]  # information needed for frequency graph
             csv_result = graph_result + [result[2], result[3]]  # information needed for csv
             graph_info.append(graph_result)  # compiles info for graph of all files in sector
             csv_info.append(csv_result)
 
 if graph_info:
-    graph_info.sort(key=lambda x: x[2])  # sort by year
+    if graph_info:
 
-    company_data = defaultdict(list)
-    for company, report, year, freq in graph_info:
-        company_data[company].append((int(year), freq))
+        graph_info.sort(key=lambda x: x[2])
 
-    for company in company_data:
-        company_data[company].sort(key=lambda x: x[0])
+        categories = list(graph_info[0][3].keys())
+        category_colors = plt.cm.tab10.colors
 
-    categories = list(graph_info[0][3].keys())
-    category_colors = plt.cm.tab10.colors
+        fig, ax = plt.subplots(figsize=(12, 6))
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+        bar_width = 0.2
+        bar_gap = 0.02
+        company_spacing = 0.5
 
-    bar_width = 0.2
-    bar_gap = 0.005
-    company_spacing = 1.0
-    bars_per_company = max(len(v) for v in company_data.values())
-    total_companies = len(company_data)
-    x_positions = []
-    tick_positions = []
-    tick_labels = []
+        company_data = defaultdict(list)
+        for company, report_type, year, freq in graph_info:
+            company_data[company].append((year, report_type, freq))
 
-    company_names = list(company_data.keys())
+        x_positions = []
+        tick_labels = []
 
-    for c_idx, company in enumerate(company_names):
-        year_data = company_data[company]
-        group_start = c_idx * (bars_per_company * (bar_width + bar_gap) + company_spacing)
-        for y_idx, (year, freq) in enumerate(year_data):
-            x = group_start + y_idx * (bar_width + bar_gap)
-            x_positions.append(x)
+        current_x = 0
+        for company, reports in company_data.items():
 
-            bottom = 0
-            for cat_idx, category in enumerate(categories):
-                height = freq.get(category, 0)
-                ax.bar(x, height, bottom=bottom, width=bar_width,
-                       color=category_colors[cat_idx % len(category_colors)])
-                bottom += height
+            reports.sort(key=lambda x: x[0])
+            for year, report_type, freq in reports:
+                x_positions.append(current_x)
 
-        mid_x = group_start + ((len(year_data) - 1) * bar_width) / 2
-        tick_positions.append(mid_x)
-        tick_labels.append(company)
+                bottom = 0
+                for cat_idx, category in enumerate(categories):
+                    height = freq.get(category, 0)
+                    ax.bar(current_x, height, bottom=bottom, width=bar_width,
+                           color=category_colors[cat_idx % len(category_colors)])
+                    bottom += height
 
-    ax.set_xticks(tick_positions)
-    ax.set_xticklabels(tick_labels)
-    ax.set_xlabel("Report")
-    ax.set_ylabel("Frequency (%)")
-    ax.set_title("Planetary Boundary Framework Word Frequency by Category")
-    ax.legend(categories, title="Categories", bbox_to_anchor=(1.05, 1), loc='upper left')
+                tick_labels.append(f"{company}, {year}, {report_type}")
 
-    plt.tight_layout()
-    st.pyplot(fig)
+                current_x += bar_width + bar_gap
+
+            current_x += company_spacing
+
+        ax.set_xticks(x_positions)
+        ax.set_xticklabels(tick_labels, rotation=45, ha="right")
+        ax.set_xlabel("Report")
+        ax.set_ylabel("Frequency (%)")
+        ax.set_title("Planetary Boundary Framework Word Frequency by Category")
+        ax.legend(categories, title="Categories", bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        plt.tight_layout()
+        st.pyplot(fig)
 
     buf = io.BytesIO()
     fig.savefig(buf, format="png")
