@@ -170,8 +170,9 @@ if graph_info:
     for company, reports in company_data.items():
 
         reports.sort(key=lambda x: x[0])
+
         for year, report_type, freq in reports:
-            x_positions.append(current_x)
+            x_positions.append(current_x + bar_width/2)
             tick_labels.append(f"{company}, {year}, {report_type}")
             bottom = 0
 
@@ -180,8 +181,6 @@ if graph_info:
                 ax.bar(current_x, height, bottom=bottom, width=bar_width,
                        color=category_colors[cat_idx % len(category_colors)])
                 bottom += height
-
-            tick_labels.append(f"{company}, {year}, {report_type}")
 
             current_x += bar_width + bar_gap
 
