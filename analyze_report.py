@@ -133,17 +133,17 @@ if uploaded_files:
         report_info = [company, report_type, year]
         st.divider()
 
-    if year and company and report_type:
-        pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text() or ""
+        if year and company and report_type:
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() or ""
 
-        result = process_text(text, report_info)
-        graph_result = [result[0][0], result[0][1], result[0][2], result[1]]  # information needed for frequency graph
-        csv_result = graph_result + [result[2], result[3]]  # information needed for csv
-        graph_info.append(graph_result)  # compiles info for graph of all files in sector
-        csv_info.append(csv_result)
+            result = process_text(text, report_info)
+            graph_result = [result[0][0], result[0][1], result[0][2], result[1]]  # information needed for frequency graph
+            csv_result = graph_result + [result[2], result[3]]  # information needed for csv
+            graph_info.append(graph_result)  # compiles info for graph of all files in sector
+            csv_info.append(csv_result)
 
 if graph_info:
     graph_info.sort(key=lambda x: x[2])  # sort by year
@@ -191,7 +191,7 @@ if graph_info:
 
     ax.set_xticks(tick_positions)
     ax.set_xticklabels(tick_labels)
-    ax.set_xlabel("Company")
+    ax.set_xlabel("Report")
     ax.set_ylabel("Frequency (%)")
     ax.set_title("Planetary Boundary Framework Word Frequency by Category")
     ax.legend(categories, title="Categories", bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -200,7 +200,7 @@ if graph_info:
     st.pyplot(fig)
 
     buf = io.BytesIO()
-    fig.savefig(buf, format="png")  # save as PNG
+    fig.savefig(buf, format="png")
     buf.seek(0)
 
     st.download_button(
