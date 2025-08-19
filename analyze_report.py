@@ -126,11 +126,14 @@ if uploaded_files:
 
     for file in uploaded_files:
         st.subheader(file.name)
-        year = st.text_input(f"Year:", key=f"year_{file.name}")
-        company = st.text_input(f"Company:", key=f"company_{file.name}")
-        report_type = st.text_input(f"Report Type:", key=f"type_{file.name}")
-
-        report_info = [company, report_type, year]
+        with st.form(key=f'form_{file.name}'):
+            year = st.text_input(f"Year:", key=f"year_{file.name}")
+            company = st.text_input(f"Company:", key=f"company_{file.name}")
+            report_type = st.text_input(f"Report Type:", key=f"type_{file.name}")
+            submit_button = st.form_submit_button(label='Submit Info'
+                                                        '')
+        if submit_button:
+            report_info = [company, report_type, year]
         st.divider()
 
         if year and company and report_type:
