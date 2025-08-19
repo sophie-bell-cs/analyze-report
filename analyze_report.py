@@ -197,16 +197,16 @@ if graph_info:
     plt.tight_layout()
     st.pyplot(fig)
 
-buf = io.BytesIO()
-fig.savefig(buf, format="png")  # save as PNG
-buf.seek(0)
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png")  # save as PNG
+    buf.seek(0)
 
-st.download_button(
-    label="Download Graph",
-    data=buf.getvalue(),
-    file_name="pb_wordcount_graph.png",
-    mime="image/png"
-)
+    st.download_button(
+        label="Download Graph",
+        data=buf.getvalue(),
+        file_name="pb_wordcount_graph.png",
+        mime="image/png"
+    )
 
 if csv_info:
     categories = list(graph_info[0][3].keys())
