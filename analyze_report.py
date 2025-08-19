@@ -3,7 +3,8 @@ from collections import defaultdict
 import re
 import csv
 import streamlit as st
-import PyPDF2
+from PyPDF2 import PdfReader
+from PyPDF2.errors import DependencyError
 import io
 
 interest_words_file = open('words_of_interest.txt', 'r')
@@ -121,84 +122,92 @@ graph_info = []
 csv_info = []
 
 if uploaded_files:
-    st.header('Add information for each file separated by commas (year,company,report). Press enter for each line before moving to the next.')
+    st.header('Add information for each file.')
     st.divider()
-
     for file in uploaded_files:
-        st.subheader(file.name)
+        try:
+            file_bytes = PdfReader(io.BytesIO(file.read()))
+            if pdf_reader.is_encrypted:
+                st.warning(f"{file.name} is encrypted and will be skipped.")
+                continue
 
-        with st.form(key=f"form_{file.name}"):
-            yr_comp_rep = st.text_input("Year,Company,Report Type", key=f"year_{file.name}")
-            submit_button = st.form_submit_button(label='Submit Info')
+            st.subheader(file.name)
 
-            if submit_button:
+            with st.form(key=f"form_{file.name}"):
+                yr_comp_rep = st.text_input("Enter Year, Company, Report Type (comma separated): ", key=f"report_{file.name}")
+                submit_button = st.form_submit_button(label='Submit Info')
                 elmnts = [e.strip() for e in yr_comp_rep.split(',')]
-                if len(elmnts) == 3:
-                    st.write(f'Year: {elmnts[0]}')
-                    st.write(f'Company: {elmnts[1]}')
-                    st.write(f'Report Type: {elmnts[2]}')
+                if submit_button and len(elmnts) == 3:
+                    if len(elmnts) == 3:
+                        st.write(f'Year: {elmnts[0]}')
+                        st.write(f'Company: {elmnts[1]}')
+                        st.write(f'Report Type: {elmnts[2]}')
 
-                    pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
-                    text = ""
-                    for page in pdf_reader.pages:
-                        text += page.extract_text() or ""
+                        pdf_reader = PdfReader(file_bytes)
+                        text = ""
+                        for page in pdf_reader.pages:
+                            text += page.extract_text() or ""
 
-                    result = process_text(text, elmnts)
-                    graph_result = [result[0][0], result[0][1], result[0][2], result[1]]
-                    csv_result = graph_result + [result[2], result[3]]
-                    graph_info.append(graph_result)
-                    csv_info.append(csv_result)
+                        result = process_text(text, elmnts)
+                        graph_result = [result[0][0], result[0][1], result[0][2], result[1]]
+                        csv_result = graph_result + [result[2], result[3]]
+                        graph_info.append(graph_result)
+                        csv_info.append(csv_result)
+
+        except DependencyError:
+            continue
+        except Exception as e:
+            continue
 
 if graph_info:
-    if graph_info:
 
-        graph_info.sort(key=lambda x: x[2])
+    graph_info.sort(key=lambda x: x[2])
 
-        categories = list(graph_info[0][3].keys())
-        category_colors = plt.cm.tab10.colors
+    categories = list(graph_info[0][3].keys())
+    category_colors = plt.cm.tab10.colors
 
-        fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(12, 6))
 
-        bar_width = 0.2
-        bar_gap = 0.02
-        company_spacing = 0.5
+    bar_width = 0.2
+    bar_gap = 0.02
+    company_spacing = 0.5
 
-        company_data = defaultdict(list)
-        for company, report_type, year, freq in graph_info:
-            company_data[company].append((year, report_type, freq))
+    company_data = defaultdict(list)
+    for company, report_type, year, freq in graph_info:
+        company_data[company].append((year, report_type, freq))
 
-        x_positions = []
-        tick_labels = []
+    x_positions = []
+    tick_labels = []
 
-        current_x = 0
-        for company, reports in company_data.items():
+    current_x = 0
+    for company, reports in company_data.items():
 
-            reports.sort(key=lambda x: x[0])
-            for year, report_type, freq in reports:
-                x_positions.append(current_x)
+        reports.sort(key=lambda x: x[0])
+        for year, report_type, freq in reports:
+            x_positions.append(current_x)
 
-                bottom = 0
-                for cat_idx, category in enumerate(categories):
-                    height = freq.get(category, 0)
-                    ax.bar(current_x, height, bottom=bottom, width=bar_width,
-                           color=category_colors[cat_idx % len(category_colors)])
-                    bottom += height
+            bottom = 0
+            for cat_idx, category in enumerate(categories):
+                height = freq.get(category, 0)
+                ax.bar(current_x, height, bottom=bottom, width=bar_width,
+                       color=category_colors[cat_idx % len(category_colors)])
+                bottom += height
 
-                tick_labels.append(f"{company}, {year}, {report_type}")
+            tick_labels.append(f"{company}, {year}, {report_type}")
 
-                current_x += bar_width + bar_gap
+            current_x += bar_width + bar_gap
 
-            current_x += company_spacing
+        current_x += company_spacing
 
-        ax.set_xticks(x_positions)
-        ax.set_xticklabels(tick_labels, rotation=45, ha="right")
-        ax.set_xlabel("Report")
-        ax.set_ylabel("Frequency (%)")
-        ax.set_title("Planetary Boundary Framework Word Frequency by Category")
-        ax.legend(categories, title="Categories", bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels(tick_labels, rotation=45, ha="right")
+    ax.set_xlabel("Report")
+    ax.set_ylabel("Frequency (%)")
+    ax.set_title("Planetary Boundary Framework Word Frequency by Category")
+    ax.legend(categories, title="Categories", bbox_to_anchor=(1.05, 1), loc='upper left')
 
-        plt.tight_layout()
-        st.pyplot(fig)
+    plt.tight_layout()
+    st.pyplot(fig)
 
     buf = io.BytesIO()
     fig.savefig(buf, format="png")
