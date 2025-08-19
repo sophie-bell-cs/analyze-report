@@ -128,27 +128,26 @@ if uploaded_files:
         st.subheader(file.name)
 
         with st.form(key=f"form_{file.name}"):
+            yr_comp_rep = st.text_input("Year,Company,Report Type", key=f"year_{file.name}")
+            submit_button = st.form_submit_button(label='Submit Info')
 
-            yr_comp_rep = st.text_input(f"Year,Company,Report Type", key=f"year_{file.name}")
-            elmnts = [e.strip() for e in yr_comp_rep.split(',')]
-            if len(elmnts) == 3:
-                st.write(f'Year: {elmnts[0]}')
-                st.write(f'Company: {elmnts[1]}')
-                st.write(f'Report Type: {elmnts[2]}')
-                submit_button = st.form_submit_button(label='Submit Info')
-        st.divider()
+            if submit_button:
+                elmnts = [e.strip() for e in yr_comp_rep.split(',')]
+                if len(elmnts) == 3:
+                    st.write(f'Year: {elmnts[0]}')
+                    st.write(f'Company: {elmnts[1]}')
+                    st.write(f'Report Type: {elmnts[2]}')
 
-        if submit_button:
-            pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text() or ""
+                    pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
+                    text = ""
+                    for page in pdf_reader.pages:
+                        text += page.extract_text() or ""
 
-            result = process_text(text, elmnts)
-            graph_result = [result[0][0], result[0][1], result[0][2], result[1]]  # information needed for frequency graph
-            csv_result = graph_result + [result[2], result[3]]  # information needed for csv
-            graph_info.append(graph_result)  # compiles info for graph of all files in sector
-            csv_info.append(csv_result)
+                    result = process_text(text, elmnts)
+                    graph_result = [result[0][0], result[0][1], result[0][2], result[1]]
+                    csv_result = graph_result + [result[2], result[3]]
+                    graph_info.append(graph_result)
+                    csv_info.append(csv_result)
 
 if graph_info:
     if graph_info:
