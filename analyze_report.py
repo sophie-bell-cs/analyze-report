@@ -122,7 +122,7 @@ graph_info = []
 csv_info = []
 
 if uploaded_files:
-    st.header('Add information for each file.')
+    st.header('Add information for each file. Press enter after typing each line.')
     st.divider()
     for file in uploaded_files:
         pdf_reader = PdfReader(io.BytesIO(file.read()))
@@ -135,16 +135,15 @@ if uploaded_files:
 
         st.subheader(file.name)
 
-        with st.form(key=f"form_{file.name}"):
-            yr_comp_rep = st.text_input("Enter Year, Company, Report Type (comma separated): ", key=f"report_{file.name}")
-            submit_button = st.form_submit_button(label='Submit Info')
-            elmnts = [e.strip() for e in yr_comp_rep.split(',')]
-            if submit_button and len(elmnts) == 3:
-                result = process_text(text, elmnts)
-                graph_result = [result[0][0], result[0][1], result[0][2], result[1]]
-                csv_result = graph_result + [result[2], result[3]]
-                graph_info.append(graph_result)
-                csv_info.append(csv_result)
+        yr_comp_rep = st.text_input("Enter Year, Company, Report Type (comma separated): ", key=f"report_{file.name}")
+
+        elmnts = [e.strip() for e in yr_comp_rep.split(',')]
+        if len(elmnts) == 3:
+            result = process_text(text, elmnts)
+            graph_result = [result[0][0], result[0][1], result[0][2], result[1]]
+            csv_result = graph_result + [result[2], result[3]]
+            graph_info.append(graph_result)
+            csv_info.append(csv_result)
 
 if graph_info:
 
