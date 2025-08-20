@@ -148,7 +148,7 @@ if uploaded_files:
 
 if graph_info:
 
-    graph_info.sort(key=lambda x: x[2])
+    graph_info.sort(key=lambda x: x[2])  # sort by year
 
     categories = list(graph_info[0][3].keys())
     category_colors = plt.cm.tab10.colors
@@ -159,33 +159,41 @@ if graph_info:
     bar_gap = 0.02
     company_spacing = 0.5
 
+    # organize data by company
     company_data = defaultdict(list)
     for company, report_type, year, freq in graph_info:
         company_data[company].append((year, report_type, freq))
 
     x_positions = []
     tick_labels = []
-
     current_x = 0
+
     for company, reports in company_data.items():
         reports.sort(key=lambda x: x[0])
 
         for year, report_type, freq in reports:
+            # append tick and position for every report
+            x_positions.append(current_x + bar_width / 2)
+            tick_labels.append(f"{company}, {year}, {report_type}")
+
+            # stack categories
             bottom = 0
             for cat_idx, category in enumerate(categories):
                 height = freq.get(category, 0)
                 ax.bar(current_x, height, bottom=bottom, width=bar_width,
                        color=category_colors[cat_idx % len(category_colors)])
                 bottom += height
-            x_positions.append(current_x + bar_width / 2)
-            tick_labels.append(f"{company}, {year}, {report_type}")
 
+            # move x for next report
             current_x += bar_width + bar_gap
 
+        # spacing between companies
         current_x += company_spacing
 
+    # set ticks and labels
     ax.set_xticks(x_positions)
     ax.set_xticklabels(tick_labels, rotation=45, ha="right")
+
     ax.set_xlabel("Report")
     ax.set_ylabel("Frequency (%)")
     ax.set_title("Planetary Boundary Framework Word Frequency by Category")
@@ -193,6 +201,7 @@ if graph_info:
 
     plt.tight_layout()
     st.pyplot(fig)
+
 
     buf = io.BytesIO()
     fig.savefig(buf, format="png")
