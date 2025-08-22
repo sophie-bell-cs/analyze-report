@@ -215,16 +215,16 @@ if graph_info:
 
 if csv_info:
     categories = list(graph_info[0][3].keys())
-    csv_headers = ['Company', 'Report', 'Year', 'Total Word Count'] + categories + ['Total Hit Count', 'Total Frequency']
+    csv_headers = ['Company', 'Report', 'Year', 'Total Word Count'] + [f'{c} %' for c in categories] + ['Total Hit Count', 'Total Frequency']
     csv_rows = []
 
     for company, report, year, category_dict, Wcount, Hcount in csv_info:
-        row = [company, report, year, Wcount]
+        row = [company, report, int(year), int(Wcount)]
         for category in categories:
-            row.append(category_dict.get(category, 0))
+            row.append(float(category_dict.get(category, 0)))
 
         total_freq = Hcount / Wcount if Wcount > 0 else 0
-        row.extend([Hcount, total_freq])
+        row.extend([int(Hcount), float(total_freq)])
         csv_rows.append(row)
 
 
